@@ -1,14 +1,11 @@
--- Write a SQL script that creates a trigger that resets
--- the attribute valid_email only when the email has been changed.
--- Context: Nothing related to MySQL, but perfect
--- for user email validation - distribute the logic
--- to the database itself!
+-- Trigger to reset the valid email attribute
+-- when email changes in users table
 
-CREATE TRIGGER reset_valid_email 
-BEFORE UPDATE ON users 
-FOR EACH ROW 
-BEGIN 
-        IF NEW.email <> OLD.email THEN 
-                SET NEW.valid_email = 0;
-        END IF;
+CREATE TRIGGER reset_valid_email
+BEFORE UPDATE ON users
+FOR EACH ROW
+BEGIN
+	IF NEW.email <> OLD.email THEN
+		SET NEW.valid_email = 0;
+	END IF;
 END;
