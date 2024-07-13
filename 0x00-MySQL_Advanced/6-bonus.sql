@@ -2,13 +2,22 @@
 -- procedure AddBonus that adds a new
 -- correction for a student.
 
-CREATE PROCEDURE AddBonus(IN user_id INT, project_name VARCHAR(255), IN score INT)
+CREATE PROCEDURE AddBonus (user_id INT, project_name VARCHAR(255), score FLOAT)
 BEGIN
-	DECLARE project_id INT;
-	SET project_id = (SELECT id FROM projects WHERE name = project_name);
-	IF project_id IS NULL THEN
-		INSERT INTO projects (name) VALUES (project_name);
-		SET project_id = LAST_INSERT_ID();
-	END IF;
-	INSERT INTO corrections (user_id, project_id, score) VALUES (user_id, project_id, score);
-END;
+    DECLARE project_count INT DEFAULT 0;
+    DECLARE project_id INT DEFAULT 0;
+
+    SELECT COUNT(id)
+        INTO project_count
+        FROM projects
+        WHERE name = project_name;
+    IF project_count = 0 THEN
+        INSERT INTO projects(name)
+            VALUES(project_name);
+    END IF;
+    SELECT id
+        INTO project_id
+        FROM projects
+        WHERE name = project_name;
+    INSERT INTO corrections(user_id, project_id, score)
+        VALUES (user_id, project_id, score);
