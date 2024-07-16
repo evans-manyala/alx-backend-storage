@@ -9,8 +9,7 @@ from pymongo import MongoClient
 
 def update_topics(mongo_collection, name, topics):
     """update school topics based on the name"""
-    result = mongo_collection.update_one(
+    mongo_collection.update_many(
         {"name": name},
         {"$set": {"topics": topics}}
     )
-    return result
