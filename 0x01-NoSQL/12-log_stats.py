@@ -11,34 +11,16 @@ def nginx_stats(mongo_collection):
     in a MongoDB collection.
     """
 
-    total_logs = mongo_collection.count_documents({})
-    print(f"{total_logs} logs")
+    client = MongoClient()
+    total_logs = client.logs.nginx
 
-    methods = ["GET", "POST", "PUT", "PATCH", "DELETE"]
-
-    if total_logs == 0:
-        print("Methods:")
-        for method in methods:
-            print(f"    method {method}: 0")
-        print(f"0 status check")
-        return
-
+    print(total_logs.count_documents({}), "logs")
     print("Methods:")
-    for method in methods:
-        count = mongo_collection.count_documents({"method": method})
-        print(f"    method {method}: {count}")
 
-    status_check_count = mongo_collection.count_documents(
-        {"method": "GET", "path": "/status"}
-    )
-    print(f"{status_check_count} status check")
-
+    for method in ("GET", "POST", "PUT", "PATCH", "DELETE"):
+        print(f"\tmethod {method}: {total_logs.count_documents({'method': method})}")
+        
+        print(f"{total_logs.count_documents({'path': '/status'})} status check")
 
 if __name__ == "__main__":
-    client = MongoClient(
-        "mongodb://localhost:27017/"
-    )
-    db = client["logs"]
-    nginx_collection = db["nginx"]
-
-    nginx_stats(nginx_collection)
+    nginx_stats()
