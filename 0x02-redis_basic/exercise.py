@@ -48,7 +48,7 @@ class Cache:
     def get(
         self,
         key: str,
-        fn: Optional[Callable[[bytes], Union[str, int, float, bytes]]] = None,
+        fn: Optional[Callable[[bytes], Union[str, int, float, bytes]]] = None
     ) -> Optional[Union[str, int, float, bytes]]:
         """
         Retrieve data from the Redis cache using the key and optionally
@@ -65,13 +65,16 @@ class Cache:
         -------
         Optional[Union[str, int, float, bytes]]
             The data retrieved from the cache, optionally converted.
-            Returns None if the key does not exist.
+            Returns None if the key does not exist or if the conversion fails.
         """
         value = self._redis.get(key)
         if value is None:
             return None
         if fn is not None:
-            return fn(value)
+            try:
+                return fn(value)
+            except (ValueError, TypeError):
+                return None
         return value
 
     def get_str(self, key: str) -> Optional[str]:
@@ -87,9 +90,9 @@ class Cache:
         -------
         Optional[str]
             The data retrieved from the cache as a string.
-            Returns None if the key does not exist.
+            Returns None if the key does not exist or if the conversion fails.
         """
-        return self.get(key, fn=lambda d: d.decode("utf-8"))
+        return self.get(key, fn=lambda d: d.decode('utf-8'))
 
     def get_int(self, key: str) -> Optional[int]:
         """
@@ -104,6 +107,6 @@ class Cache:
         -------
         Optional[int]
             The data retrieved from the cache as an integer.
-            Returns None if the key does not exist.
+            Returns None if the key does not exist or if the conversion fails.
         """
-        return self.get(key, fn=int)
+        return self.get(key, fn=lambda d: int(d))
